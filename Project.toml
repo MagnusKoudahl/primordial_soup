@@ -1,0 +1,6 @@
+[deps]
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+OhMyREPL = "5fb14364-9ced-5910-84b2-373655c76a03"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
