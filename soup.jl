@@ -115,7 +115,6 @@ for t in 1:dt:T
     display(p)
 end
 
-
 # Final adjacency matrix
 B = (A + A' + A'*A) .> 0
 closeall()

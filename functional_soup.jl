@@ -116,10 +116,12 @@ for t in 1:dt:T
 
     # Plot results. Initially some of the particles blast off to nowhere, so axes are fixed to give good visuals. This also happens in fep_physics.m but to a lesse degree.
     if t > 1000
-	p = scatter(aₙ[:,1],aₙ[:,2],markersize=4.5,legend=false,title=t,xlim=(-8,8),ylim=(-8,8))
+	p = scatter(aₙ[:,1],aₙ[:,2],markersize=4.5,legend=false,title=t)#,xlim=(-8,8),ylim=(-8,8))
 	display(p)
     end
 end
+
+savefig("Final_state.png")
 
 closeall()
 
