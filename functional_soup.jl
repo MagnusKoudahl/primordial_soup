@@ -4,8 +4,6 @@ enable_autocomplete_brackets(false)
 
 # This demo is based off of the equations in AFEPFAPP. They differ slightly from the implementation in fep_physics.m
 
-# There is a slight bug (?) where the repulsive force will sometimes explode and shoot single particles way out of the cluster. They always come back though, so it might just be a feature of the simulation prior to convergence? My hunch is that it's an instability of the Forward Euler-Maruyama integration scheme
-
 # Distance metric
 dist = Euclidean()
 

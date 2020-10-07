@@ -6,16 +6,15 @@ enable_autocomplete_brackets(false)
 
 # Distance metric
 dist = Euclidean()
-sym = issymmetric # Handy for debugging
 
 # Number of particles
 n = 128
-# Electrochemical state variances
+# Initial electrochemical state variances
 σ_aₑ = 1. /32.
 σ_sₑ = 1. /32.
 σ_μ = 1. /32.
 
-# Newtonian state variances
+# Initial Newtonian state variances
 σ_aₙ = 4.
 σ_sₙ = 1.
 
@@ -24,8 +23,9 @@ n = 128
 
 # Step size and horizon
 dt = 1/512 # fep_physics demo runs 1/32
-T = 20.0
+T = 1100.0
 
+# Global variables fix Julias funky scoping behaviour. Also makes everything slow
 # Electrochemical states
 global aₑ = rand(MvNormal(I(n) * σ_aₑ))
 global sₑ = rand(MvNormal(I(n) * σ_sₑ))
@@ -38,8 +38,7 @@ global sₙ = reshape(rand(MvNormal(zeros(2n),I(2n) * σ_aₙ)),n,2)
 # Rate parameter. fep_physics demo does not divide by 32. That happens when setting initial states for some reason
 κ = (1. .- exp.(-4. .* rand(n))) / 32.
 
-
-for t in 1:dt:T
+function dynamics(aₙ,sₙ,aₑ,sₑ,μ,κ,ω,dist)
     # Distance matrix
     Δ_ij = pairwise(dist,aₙ',dims=2)
 
@@ -52,6 +51,8 @@ for t in 1:dt:T
     # Get absolute difference between all particles aₑ.
     aₑⁱ= ones(n) * aₑ'
     Δaₑⁱ = -abs.(aₑⁱ - aₑⁱ')
+
+    # fep_physics.m has Q and C to compute the force term. We keep the naming here to make it easier to parse the matlab code if one is so inclined
 
     # Compute the inner term in eq 3.2.
     # Q = 8. * exp.(Δaₑⁱ .* 2) .-2 - this line is LAWKI
@@ -96,7 +97,13 @@ for t in 1:dt:T
     # Newtonian
     aₙ_dot = (1. .+ (μ ./ 64.)) .* sₙ .+ rand(ω)
     sₙ_dot = 2*F .- 8 * sₙ - aₙ .+ rand(ω)
+    return [sₑ_dot,aₑ_dot,μ_dot,aₙ_dot,sₙ_dot]
+end
 
+
+for t in 1:dt:T
+    # Compute derivatives
+    sₑ_dot,aₑ_dot,μ_dot,aₙ_dot,sₙ_dot = dynamics(aₙ,sₙ,aₑ,sₑ,μ,κ,ω,dist)
     # Apply updates
     global sₑ += dt * sₑ_dot
     global aₑ += dt * aₑ_dot
@@ -105,11 +112,14 @@ for t in 1:dt:T
     global aₙ += dt .* aₙ_dot
     global sₙ += dt .* sₙ_dot
 
-    # Plot results
-    p = scatter(aₙ[:,1],aₙ[:,2],markersize=4.5,legend=false,title=t)
-    display(p)
+    # Plot results. Initially some of the particles blast off to nowhere, so axes are fixed to give good visuals. This also happens in fep_physics.m but to a lesse degree.
+    if t > 1000
+	p = scatter(aₙ[:,1],aₙ[:,2],markersize=4.5,legend=false,title=t)#,xlim=(-8,8),ylim=(-8,8))
+	display(p)
+    end
 end
 
+savefig("Final_state.png")
 
-# Final adjacency matrix
-B = (A + A' + A'*A) .> 0
+closeall()
+
