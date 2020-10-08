@@ -22,7 +22,7 @@ n = 128
 ω = MvNormal(I(n) * 1/8)
 
 # Step size and horizon
-dt = 1/512 # fep_physics demo runs 1/32
+dt = 1/256 # fep_physics demo runs 1/32
 T = 1100.0
 
 # Global variables fix Julias funky scoping behaviour. Also makes everything slow
@@ -113,8 +113,8 @@ for t in 1:dt:T
     global sₙ += dt .* sₙ_dot
 
     # Plot results. Initially some of the particles blast off to nowhere, so axes are fixed to give good visuals. This also happens in fep_physics.m but to a lesse degree.
-    if t > 1000
-	p = scatter(aₙ[:,1],aₙ[:,2],markersize=4.5,legend=false,title=t)#,xlim=(-8,8),ylim=(-8,8))
+    if t > 1000 && mod(t,1) == 0.0
+	p = scatter(aₙ[:,1],aₙ[:,2],markersize=4.5,legend=false,title=t,xlim=(-8,8),ylim=(-8,8))
 	display(p)
     end
 end
